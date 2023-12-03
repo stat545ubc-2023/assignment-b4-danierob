@@ -1,0 +1,82 @@
+---
+title: "B4"
+author: "Daniel"
+date: "2023-12-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+## Srings and Functional Programming
+
+This is the final STAT 545 porject of the semseter. I have selected **Option A: Strings and Functional Programming in R** for my project.
+
+### Exercise 1: Dissecting Frankenstein
+
+For the first half of this project, in exercise 1, we will look at the most common words in Mary Shelly's Frankenstein by creating a word map. This project will rely some map() from the purrr package, some regex, and a lot of tidyverse.
+
+Libraries
+
+```{r libraries}
+library(readr)
+library(tidytext)
+library(tidyverse)
+library(stopwords)
+library(tm)
+```
+
+First we load in Frankenstein.txt (source: [Project Gutenburg](https://dev.gutenberg.org/ebooks/84)) using the read_lines() function from the readr package
+
+```{r loading in text}
+text <- read_lines ("Frankenstein.txt")
+ 
+text_df <- data_frame(Text = text) 
+
+#Converting txt into a tidy dataset with one word per row using unnest_tokens()
+text_words <- text_df %>% 
+  unnest_tokens(output = word, input = Text) 
+```
+
+Create function for removing stopwords (from the stopwords package) and punctuation and numbers
+
+```{r function}
+cut_stopwords <- function(text) {
+  text %>%
+    removePunctuation() %>%
+    removeNumbers() %>%
+    removeWords(stopwords::stopwords())
+}
+
+```
+
+Use purrr::map to preprocess the text using our new cut_stopwords function
+
+```{r}
+text_trimmed <- map(text_words, cut_stopwords)
+
+#turning text_trimmed list into a tibble so I can work with it to get word counts
+text_trimmed <- as_tibble(text_trimmed)
+
+#cleaning out the empty rows with regex grepl() function so we don't count blanks
+text_trimmed <- text_trimmed %>%
+   filter_all(any_vars(!grepl("^\\s*$", .)))
+
+#word count with the stopwords removed using count() function
+word_count <- text_trimmed  %>% 
+  count(word, sort = TRUE)
+```
+
+Everything looks good now with the word count, now to make a plot of the top words
+
+```{r frankensten word plot}
+word_count %>%
+  filter(n > 70) %>% 
+  ggplot(aes(x = n, y = reorder(factor(word, levels = word_count$word), n)))+
+  geom_col(fill = "darkslategray", color = "darkseagreen")+
+  xlab("count") + ylab("word") + ggtitle("Most recurring words in Mary Shelly's Frankenstein")
+  
+```
+
+Love this book. Compared to other books that would be full of character names, the only character directly mentioned here is Elizabeth who isn't even in the book all that much but surrounds a lot of the hostility that Victor and the monster have for each other. The dichotomy of the words in this list, "night" and "day" and "life" and "death" gives a lot of insight into the duality of morals that is central to the book and to the monster and even Victor's attempts to reconcile with their own existence and their actions.
