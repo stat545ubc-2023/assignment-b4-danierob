@@ -24,6 +24,8 @@ __Frankenstein.txt__ is a text file of Mary Shelley's Frankstein sourced from Pr
 
 __data__ is a folder with the "field_data" file from my own research, which serve as the source for the models in Exercise 3.
 
+__B4_files__ folder containing the files for the plots in Exercise 1 and Exercise 3 to be read in .md file.
+
 ### How to run the code 
 * Open RStudio  
 * Click "File" in the upper lefthand corner  
