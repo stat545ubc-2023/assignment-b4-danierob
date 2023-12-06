@@ -1,5 +1,5 @@
 #### Author: Daniel Robinson
-## Assignment B4: Option A – Strings and functional programming in R 
+# Assignment B4: Option A – Strings and functional programming in R 
 
 Weclome to the final STAT 545 Assignment. I elected for option A for my final project.
 
@@ -13,7 +13,7 @@ For this analysis, we utilize the tidyverse, the map() functions from the purrr 
 For exercise 3, I looked at data from my own research to run multiple linear models across the different levels of a group. 
 In my thesis data, I am interested in the relationship between 8 groups of my response variable and one explanatory variable. Data was collected periodically throughout the dry season, and each obs_period group represents data collected later in the dry season. Rather than run each relationship as a separate model, I will use the "map" family of functions in the purrr package to apply a linear model to multiple columns simultaneously.
 
-# Files Descrpition  
+### Files Descrpition  
 __README.md__ provides a brief descrption of the author, intent, and files in this repository.  
 
 __B4.Rmd__ is an R markdown file where all code and descriptions were recorded.
@@ -24,7 +24,7 @@ __Frankenstein.txt__ is a text file of Mary Shelley's Frankstein sourced from Pr
 
 __data__ is a folder with the "field_data" file from my own research, which serve as the source for the models in Exercise 3.
 
-# How to run the code:  
+### How to run the code:  
 * Open RStudio  
 * Click "File" in the upper lefthand corner  
 * Click "New Project"  
@@ -35,7 +35,7 @@ __data__ is a folder with the "field_data" file from my own research, which serv
 * Under the "Files" tab you can select whichever file of code you would like to run    
 * You can now run our code in RStudio!  
 
-# How to run Rmarkdown (.Rmd) file:
+### How to run Rmarkdown (.Rmd) file:
 * Open RStudio
 * Follow above steps and select a ".Rmd" file
 * Click "Knit" to generate a ".md" file
