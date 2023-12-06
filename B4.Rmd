@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
-## Srings and Functional Programming
+## Strings and Functional Programming
 
 This is the final STAT 545 porject of the semseter. I have selected **Option A: Strings and Functional Programming in R** for my project.
 
@@ -24,6 +24,7 @@ library(readr)
 library(tidytext)
 library(tidyverse)
 library(stopwords)
+library(broom)
 library(tm)
 ```
 
@@ -80,3 +81,77 @@ word_count %>%
 ```
 
 Love this book. Compared to other books that would be full of character names, the only character directly mentioned here is Elizabeth who isn't even in the book all that much but surrounds a lot of the hostility that Victor and the monster have for each other. The dichotomy of the words in this list, "night" and "day" and "life" and "death" gives a lot of insight into the duality of morals that is central to the book and to the monster and even Victor's attempts to reconcile with their own existence and their actions.
+
+### Exercise 3: Fitting multiple models with purrr
+
+In my thesis data, I am interested in the relationship between 8 groups of my response variable and one explanatory variable. Data was collected periodically throughout the dry season, and each obs_period group represents data collected later in the dry season. Rather than run each relationship as a separate model, I will use the map family of functions in the purrr package to apply a linear model to multiple columns simultaneously. 
+
+First, I will read in my data
+```{r load data}
+library(readr)
+field_data <- read_csv("data/field_data.csv", 
+    col_types = cols(date = col_date(format = "%m/%d/%Y"), 
+        obs_period = col_character(), LAI = col_number(), 
+        air_temp = col_number(), soil_moist = col_number()))
+head(field_data)
+```
+Okay, data is in. I have averages for the explanatory variable: canopy cover (represented as LAI) for each observation period. Each obeservation period spans one to two weeks over the course of a season and I am curious how the relationship between canopy cover (LAI) and air temperature changed with each observation period. I expect the relationship to be linear so I will be fitting linear models across all 8 obs_period groups, using the purrr package to model them all at once. 
+
+First, I will nest the field data into tibbles of my grouping variable (obs_period), and then use mutate() on the nested data to run the lm() function  with map() across all obs periods to get lists for the model outputs of the relationship between LAI and air_temp. 
+
+``` {r}
+field_data_na <- na.omit(field_data)
+
+
+# '~' defines anonymous function and '.' serves as placeholder for the function argument.
+data_model <- field_data_na %>% 
+  group_by(obs_period) %>% 
+  nest() %>% 
+  mutate(
+    model = map(data, ~lm(data =., air_temp ~ LAI)),  
+    coeffs = map(model, coefficients),
+    preds = map(model, augment)
+  )
+
+list(data_model)
+```
+
+I am interested in comparing the slopes and intercepts between all of the observation periods, so I can use map_dbl() to extract the second element (slope) from the coefficients column. I will call slope via indexing and intercept by name using quotes "" just for practice.
+
+```{r}
+data_model %>% 
+  mutate(slope = map_dbl(coeffs, 2)) %>% 
+    mutate(Intercept = map_dbl(coeffs, "(Intercept)"))
+
+```
+
+Alternatively, we can use the broom() package to pull all of the data from the model lists: here we can see estimate, standard errors and p-values for slopes and intercepts. We will remove the unnecessary columns with the nested information to view the helpful model data. 
+
+```{r broom}
+data_model %>%
+  mutate(coef = map(model, tidy)) %>%
+  unnest(coef) %>% 
+   select(-data, -model, - coeffs, -preds)
+```
+
+From the broom() sweep we can see that all of the relationships are significant, but I would like to visualize how the relationships differ in slope. 
+
+We will get the predictions from the "preds" column created in the original nested dataset using the map(function) and broom's augment. I will plot the data points with the original data and evaluate the slopes from our predictions represented as trend lines. 
+ 
+```{r}
+unnested_preds <- 
+  data_model %>% 
+  unnest(preds)
+
+unnested_preds 
+
+
+ggplot(field_data_na, aes(x = field_data_na$LAI, y = field_data_na$air_temp)) +
+   geom_point(aes(color = plot_type), alpha = 0.7, shape = 1) +
+   facet_grid(. ~ obs_period, scales = "free") +
+   geom_line(data = unnested_preds, aes(y = .fitted, LAI), color = "darkred")
+```
+#### Results:
+
+We see a slightly increasing slope as the season progresses, but generally the negative trend is comparable. Observation 1 and 2 have outliers that appear to fall in line with the rest of the data as the year progresses, so I will need to look into those further, perhaps one of the ddf (open canopy) plots are particularly in the early dry season. We see an increase in overall temperature, represented by the increasing intercepts, as the dry season progresses with a peak at observation 7.
+
