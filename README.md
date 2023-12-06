@@ -9,7 +9,7 @@ For this analysis, we utilize the tidyverse, the map() functions from the purrr 
 
 **DATA SOURCE** .txt file for Frankenstein was sourced from [Project Gutenberg](https://dev.gutenberg.org/ebooks/84) and inspiration for code and methods came largely from [tidytextmining.com](https://www.tidytextmining.com/tidytext).
 
-### Exercise 3: 
+### Exercise 3 
 For exercise 3, I looked at data from my own research to run multiple linear models across the different levels of a group. 
 In my thesis data, I am interested in the relationship between 8 groups of my response variable and one explanatory variable. Data was collected periodically throughout the dry season, and each obs_period group represents data collected later in the dry season. Rather than run each relationship as a separate model, I will use the "map" family of functions in the purrr package to apply a linear model to multiple columns simultaneously.
 
@@ -24,7 +24,7 @@ __Frankenstein.txt__ is a text file of Mary Shelley's Frankstein sourced from Pr
 
 __data__ is a folder with the "field_data" file from my own research, which serve as the source for the models in Exercise 3.
 
-### How to run the code:  
+### How to run the code 
 * Open RStudio  
 * Click "File" in the upper lefthand corner  
 * Click "New Project"  
@@ -35,7 +35,7 @@ __data__ is a folder with the "field_data" file from my own research, which serv
 * Under the "Files" tab you can select whichever file of code you would like to run    
 * You can now run our code in RStudio!  
 
-### How to run Rmarkdown (.Rmd) file:
+### How to run Rmarkdown (.Rmd) file
 * Open RStudio
 * Follow above steps and select a ".Rmd" file
 * Click "Knit" to generate a ".md" file
